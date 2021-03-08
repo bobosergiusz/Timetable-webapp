@@ -1,0 +1,49 @@
+@import '~antd/dist/antd.css';
+
+.timetable
+{
+    text-align: center;
+    background: white;
+    color: black;
+}
+.timetable-header {
+    text-align: left;
+}
+.monthpicker
+{
+    font-size: 30px;
+}
+.ant-picker-large .ant-picker-input > input {
+    font-size: 30px;
+}
+.day-label
+{
+    font-size: 30px;
+}
+.day-schedule
+{
+    border: #fafafa;
+    border-style: solid;
+    border-width: 1px;
+}
+.hour-label
+{
+    font-size: 20px;
+    font-weight: bold;
+}
+.footer-divider
+{
+    height: 100px
+}
+.shadowed-box
+{
+    background-color: #fafafa;
+    border-color: #fafafa;
+    box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%);
+    width: 95%;
+    margin: auto;
+}
+.appointment-card
+{
+    background-color: #afafaf;
+}

@@ -1,0 +1,17 @@
+@import '~antd/dist/antd.css';
+
+.logo {
+    float: left;
+    color: aliceblue;
+    font-size: xx-large;
+    font-weight: bold;
+  }
+
+.datepicker {
+    color: aliceblue;
+    font-size: x-large;
+}
+
+.footerz {
+    text-align: center;
+}
