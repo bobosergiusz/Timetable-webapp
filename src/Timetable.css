@@ -43,7 +43,28 @@
     width: 95%;
     margin: auto;
 }
-.appointment-card
+.appointment-card-accepted
 {
     background-color: #afafaf;
+}
+.appointment-card-pending
+{
+    background-color: #42424298;
+}
+.appointment-card-accepted:hover
+{
+    background-color: #b9434360;
+}
+.appointment-card-pending:hover
+{
+    background-color: #b9434360;
+}
+.add-appointment-hover
+{
+    font-size: 20px;
+}
+.add-appointment-input
+{
+    font-size: 20px;
+    background-color: fafafa;
 }

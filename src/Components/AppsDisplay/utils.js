@@ -1,63 +1,9 @@
-import { useEffect, useState } from "react";
-import { Card, Col, Row } from "antd";
+import { Card, Col, Row, Popover, Button } from "antd";
 
-import PropTypes from "prop-types";
+import { HOUR_PIXELS } from "./config";
+import { FIRST_HOUR, LAST_HOUR } from "../../config";
 
-import FakeEndpoint from "./FakeEndpoint";
-
-const FIRST_HOUR = 8;
-const LAST_HOUR = 17;
-const HOUR_PIXELS = 100;
 const MILIS_IN_HOUR = 60 * 60 * 1000;
-
-const AppsDisplay = ({ days }) => {
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    setData(FakeEndpoint.getAppointments());
-  });
-
-  const binnedData = binDataIntoDays(data, days);
-
-  return (
-    <Row gutter={8}>
-      <HoursRibbon labelClassName="hour-label" />
-      {binnedData.map((bin, id) => (
-        <DaySchedule
-          key={id}
-          day={bin.day}
-          data={bin.data}
-          className="day-schedule shadowed-box"
-          cardClassName="appointment-card shadowed-box"
-        />
-      ))}
-    </Row>
-  );
-};
-
-const HoursRibbon = ({ labelClassName }) => {
-  const hourLabels = [];
-  for (let i = FIRST_HOUR; i <= LAST_HOUR; i++) {
-    hourLabels.push(<HourLabel hour={i + ":00"} className={labelClassName} />);
-  }
-  return <Col span={2}>{hourLabels}</Col>;
-};
-
-const DaySchedule = ({ day, data, className, cardClassName }) => {
-  const height = (LAST_HOUR - FIRST_HOUR + 1) * HOUR_PIXELS;
-  return (
-    <Col span={3}>
-      <div className={className} style={{ height: height }}>
-        {layoutCards(day, data, cardClassName)}
-      </div>
-    </Col>
-  );
-};
-
-const HourLabel = ({ hour, className }) => (
-  <Row style={{ height: HOUR_PIXELS }} justify="end">
-    <Col className={className}>{hour}</Col>
-  </Row>
-);
 
 const binDataIntoDays = (data, days) => {
   const returnValue = days.map((day) => ({ day: day, data: [] }));
@@ -76,7 +22,13 @@ const binDataIntoDays = (data, days) => {
   return returnValue;
 };
 
-const layoutCards = (day, data, cardClassName) => {
+const layoutCards = (
+  day,
+  data,
+  acceptAppointment,
+  cardClassNameAccepted,
+  cardClassNamePending
+) => {
   const lowerLimit = day.clone().hour(FIRST_HOUR);
   const upperLimit = day.clone().hour(LAST_HOUR + 1);
 
@@ -99,7 +51,13 @@ const layoutCards = (day, data, cardClassName) => {
     arrangedData,
     lowerLimit,
     upperLimit,
-    (item) => createGroup(item, cardClassName)
+    (item) =>
+      createGroup(
+        item,
+        acceptAppointment,
+        cardClassNameAccepted,
+        cardClassNamePending
+      )
   );
   return returnValue;
 };
@@ -159,7 +117,12 @@ const pushBetween = (data, lowerLimit, upperLimit, transformItem) => {
   return returnValue;
 };
 
-const createGroup = (group, cardClassName) => {
+const createGroup = (
+  group,
+  acceptAppointment,
+  cardClassNameAccepted,
+  cardClassNamePending
+) => {
   const lowerLimit = group.since;
   const upperLimit = group.until;
   const columnsArray = group.columns;
@@ -167,7 +130,12 @@ const createGroup = (group, cardClassName) => {
   const columns = columnsArray.map((col, id) => (
     <Col flex="1" key={id}>
       {pushBetween(col, lowerLimit, upperLimit, (item) =>
-        createCard(item, cardClassName)
+        createCard(
+          item,
+          acceptAppointment,
+          cardClassNameAccepted,
+          cardClassNamePending
+        )
       )}
     </Col>
   ));
@@ -180,28 +148,35 @@ const createSpace = (since, until) => {
   const height = (milis / MILIS_IN_HOUR) * HOUR_PIXELS;
   return <div style={{ height: height }} />;
 };
-const createCard = (item, className) => {
+const createCard = (
+  item,
+  acceptAppointment,
+  classNameAccepted,
+  classNamePending
+) => {
   const milis = item.until - item.since;
   const height = (milis / MILIS_IN_HOUR) * HOUR_PIXELS;
   return (
-    <Card style={{ height: height }} className={className} title={item.id} />
+    <Popover
+      trigger="click"
+      content={
+        <div>
+          <Button
+            disabled={item.accepted}
+            onClick={() => acceptAppointment(item.id)}
+          >
+            Accept Me!
+          </Button>
+        </div>
+      }
+    >
+      <Card
+        style={{ height: height }}
+        className={item.accepted ? classNameAccepted : classNamePending}
+        title={item.id}
+      />
+    </Popover>
   );
 };
 
-AppsDisplay.propTypes = {
-  days: PropTypes.array,
-};
-HoursRibbon.propTypes = {
-  labelClassName: PropTypes.string,
-};
-HourLabel.propTypes = {
-  hour: PropTypes.string,
-  className: PropTypes.string,
-};
-DaySchedule.propTypes = {
-  data: PropTypes.array,
-  day: PropTypes.date,
-  className: PropTypes.string,
-  cardClassName: PropTypes.string,
-};
-export default AppsDisplay;
+export { binDataIntoDays, layoutCards };
