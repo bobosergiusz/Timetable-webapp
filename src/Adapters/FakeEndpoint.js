@@ -77,7 +77,7 @@ const FakeEndpoint = {
       prepared.until = moment(prepared.until);
       arrPrepared.push(prepared);
     }
-    return arrPrepared;
+    return new Promise((resolve) => resolve(arrPrepared));
   },
   postAppointment(since, until) {
     const prepared = {};
@@ -89,7 +89,7 @@ const FakeEndpoint = {
     const toReturn = Object.assign({}, prepared);
     toReturn.since = since;
     toReturn.until = until;
-    return toReturn;
+    return new Promise((resolve) => resolve(toReturn));
   },
   putAppointment(id) {
     const app = this.appointments.find((el) => el.id == id);
@@ -97,7 +97,7 @@ const FakeEndpoint = {
     const toReturn = Object.assign({}, app);
     toReturn.since = moment(toReturn.since);
     toReturn.until = moment(toReturn.until);
-    return toReturn;
+    return new Promise((resolve) => resolve(toReturn));
   },
   availableId() {
     const sorted = [...this.appointments].sort((a, b) => {

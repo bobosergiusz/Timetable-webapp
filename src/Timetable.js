@@ -2,40 +2,36 @@ import React, { useState, useEffect } from "react";
 import { DatePicker, Divider, Layout, Row, Col } from "antd";
 import moment from "moment";
 
+import PropTypes from "prop-types";
+
 import DaysRibbon from "./Components/DaysRibbon/DaysRibbon";
 import AppsDisplay from "./Components/AppsDisplay/AppsDisplay";
 import AppCreation from "./Components/AppCreation/AppCreation";
 import { daysOfTheWeekFromDate } from "./utils";
 
-import FakeEndpoint from "./FakeEndpoint";
-
 import "./Timetable.css";
-
-//TODO in appcreation
-//validate at least 5 minutes chosen
-//cant choose past
-
-//TODO: fix all errors
 
 const { Header, Content } = Layout;
 
-function Timetable() {
+function Timetable({ Endpoint }) {
   const [baseMonday, setBaseMonday] = useState(moment().startOf("isoWeek"));
   const daysToDisplay = daysOfTheWeekFromDate(baseMonday);
 
   const [dataToDisplay, setDataToDisplay] = useState([]);
   useEffect(() => {
-    setDataToDisplay(FakeEndpoint.getAppointments());
+    Endpoint.getAppointments().then((res) => setDataToDisplay(res));
   }, []);
 
   const addAppointment = (since, until) => {
-    FakeEndpoint.postAppointment(since, until);
-    setDataToDisplay(FakeEndpoint.getAppointments());
+    Endpoint.postAppointment(since, until).then(() =>
+      Endpoint.getAppointments().then((res) => setDataToDisplay(res))
+    );
   };
 
   const acceptAppointment = (id) => {
-    FakeEndpoint.putAppointment(id);
-    setDataToDisplay(FakeEndpoint.getAppointments());
+    Endpoint.putAppointment(id).then(() =>
+      Endpoint.getAppointments().then((res) => setDataToDisplay(res))
+    );
   };
 
   return (
@@ -84,5 +80,9 @@ function Timetable() {
     </Layout>
   );
 }
+
+Timetable.propTypes = {
+  Endpoint: PropTypes.object,
+};
 
 export default Timetable;

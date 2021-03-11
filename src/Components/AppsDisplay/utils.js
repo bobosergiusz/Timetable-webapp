@@ -128,7 +128,7 @@ const createGroup = (
   const columnsArray = group.columns;
 
   const columns = columnsArray.map((col, id) => (
-    <Col flex="1" key={id}>
+    <Col flex="1" key={id} style={{ minWidth: 0 }}>
       {pushBetween(col, lowerLimit, upperLimit, (item) =>
         createCard(
           item,
