@@ -4,6 +4,7 @@ import { UserOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 
 //TODO: add button to see owned calendar if service logged in
+//TODO: add proper backend error handling
 function UserSection({ userState, onSignIn, onSignOut }) {
   const popoverContent = userState?.userSignedIn ? (
     <UserInfo userData={userState.userData} onSignOut={onSignOut} />

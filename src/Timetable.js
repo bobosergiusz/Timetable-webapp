@@ -32,21 +32,25 @@ function Timetable({ Endpoint, accountName, userToken }) {
       description,
       token
     ).then(
-      () => message.success("Appointment proposed!"),
+      () => {
+        message.success("Appointment proposed!");
+        Endpoint.getAppointments(accountName, token).then((res) =>
+          setDataToDisplay(res)
+        );
+      },
       () => message.error("There was some error!")
-    );
-    Endpoint.getAppointments(accountName, token).then((res) =>
-      setDataToDisplay(res)
     );
   };
 
   const acceptAppointment = (accountName, id, token) => {
     Endpoint.putAppointment(accountName, id, token).then(
-      () => message.success("Appointment accepted!"),
+      () => {
+        message.success("Appointment accepted!");
+        Endpoint.getAppointments(accountName, token).then((res) =>
+          setDataToDisplay(res)
+        );
+      },
       () => message.error("There was some error!")
-    );
-    Endpoint.getAppointments(accountName, token).then((res) =>
-      setDataToDisplay(res)
     );
   };
 
