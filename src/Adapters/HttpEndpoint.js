@@ -13,6 +13,13 @@ const HttpEndpoint = {
         "Content-Type": "application/json",
       },
     })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Error");
+        } else {
+          return res;
+        }
+      })
       .then((res) => res.json())
       .then((item) => this.prepareUser(item));
     return promise;
@@ -29,6 +36,13 @@ const HttpEndpoint = {
         "Content-Type": "application/json",
       },
     })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Error");
+        } else {
+          return res;
+        }
+      })
       .then((res) => res.json())
       .then((res) => {
         res.token = res.access_token;
@@ -77,6 +91,13 @@ const HttpEndpoint = {
         },
       }
     )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Error");
+        } else {
+          return res;
+        }
+      })
       .then((res) => res.json())
       .then((item) => this.prepareApp(item));
     return promise;
@@ -89,6 +110,13 @@ const HttpEndpoint = {
         headers: { Authorization: `Bearer ${token}` },
       }
     )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Error");
+        } else {
+          return res;
+        }
+      })
       .then((res) => res.json())
       .then((item) => this.prepareApp(item));
     return promise;
