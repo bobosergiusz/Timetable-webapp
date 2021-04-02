@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DatePicker, Divider, Layout, Row, Col } from "antd";
+import { DatePicker, Divider, Layout, Row, Col, message } from "antd";
 import moment from "moment";
 
 import PropTypes from "prop-types";
@@ -13,24 +13,40 @@ import "./Timetable.css";
 
 const { Header, Content } = Layout;
 
-function Timetable({ Endpoint }) {
+function Timetable({ Endpoint, accountName, userToken }) {
   const [baseMonday, setBaseMonday] = useState(moment().startOf("isoWeek"));
   const daysToDisplay = daysOfTheWeekFromDate(baseMonday);
 
   const [dataToDisplay, setDataToDisplay] = useState([]);
   useEffect(() => {
-    Endpoint.getAppointments().then((res) => setDataToDisplay(res));
+    Endpoint.getAppointments(accountName, userToken).then((res) => {
+      setDataToDisplay(res);
+    });
   }, []);
 
-  const addAppointment = (since, until) => {
-    Endpoint.postAppointment(since, until).then(() =>
-      Endpoint.getAppointments().then((res) => setDataToDisplay(res))
+  const addAppointment = (accountName, since, until, description, token) => {
+    Endpoint.postAppointment(
+      accountName,
+      since,
+      until,
+      description,
+      token
+    ).then(
+      () => message.success("Appointment proposed!"),
+      () => message.error("There was some error!")
+    );
+    Endpoint.getAppointments(accountName, token).then((res) =>
+      setDataToDisplay(res)
     );
   };
 
-  const acceptAppointment = (id) => {
-    Endpoint.putAppointment(id).then(() =>
-      Endpoint.getAppointments().then((res) => setDataToDisplay(res))
+  const acceptAppointment = (accountName, id, token) => {
+    Endpoint.putAppointment(accountName, id, token).then(
+      () => message.success("Appointment accepted!"),
+      () => message.error("There was some error!")
+    );
+    Endpoint.getAppointments(accountName, token).then((res) =>
+      setDataToDisplay(res)
     );
   };
 
@@ -58,7 +74,9 @@ function Timetable({ Endpoint }) {
           </Col>
           <Col span="12">
             <AppCreation
-              addAppointment={(since, until) => addAppointment(since, until)}
+              addAppointment={addAppointment}
+              owner={accountName}
+              userToken={userToken}
             ></AppCreation>
           </Col>
         </Row>
@@ -73,7 +91,9 @@ function Timetable({ Endpoint }) {
         <AppsDisplay
           data={dataToDisplay}
           days={daysToDisplay}
-          acceptAppointment={(id) => acceptAppointment(id)}
+          acceptAppointment={acceptAppointment}
+          owner={accountName}
+          userToken={userToken}
         />
         <div className="footer-divider"></div>
       </Content>
@@ -83,6 +103,8 @@ function Timetable({ Endpoint }) {
 
 Timetable.propTypes = {
   Endpoint: PropTypes.object,
+  accountName: PropTypes.string,
+  userToken: PropTypes.string,
 };
 
 export default Timetable;

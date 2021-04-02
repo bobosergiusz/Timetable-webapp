@@ -1,12 +1,17 @@
 import moment from "moment";
 
 const HttpEndpoint = {
+  createUser() {},
+  login() {},
+  searchServices() {},
+
   getAppointments() {
     const promise = fetch("http://127.0.0.1/appointment")
       .then((res) => res.json())
       .then((res) => res.map((item) => this.prepareItem(item)));
     return promise;
   },
+  getAppointmentDetail() {},
   postAppointment(since, until) {
     const data = {};
     data.since = since.format("YYYY-MM-DD HH:mm");
@@ -21,7 +26,7 @@ const HttpEndpoint = {
     });
     return promise;
   },
-  putAppointment(id) {
+  putAppointment(account_name, id) {
     const promise = fetch(`http://127.0.0.1/appointment/${id}`, {
       method: "PUT",
     });

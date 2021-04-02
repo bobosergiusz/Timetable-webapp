@@ -1,6 +1,5 @@
 import { Row, Col, Button } from "antd";
 import { LeftSquareOutlined, RightSquareOutlined } from "@ant-design/icons";
-// import { Moment } from "moment";
 
 import PropTypes from "prop-types";
 

@@ -27,7 +27,9 @@ const layoutCards = (
   data,
   acceptAppointment,
   cardClassNameAccepted,
-  cardClassNamePending
+  cardClassNamePending,
+  owner,
+  userToken
 ) => {
   const lowerLimit = day.clone().hour(FIRST_HOUR);
   const upperLimit = day.clone().hour(LAST_HOUR + 1);
@@ -56,7 +58,9 @@ const layoutCards = (
         item,
         acceptAppointment,
         cardClassNameAccepted,
-        cardClassNamePending
+        cardClassNamePending,
+        owner,
+        userToken
       )
   );
   return returnValue;
@@ -121,7 +125,9 @@ const createGroup = (
   group,
   acceptAppointment,
   cardClassNameAccepted,
-  cardClassNamePending
+  cardClassNamePending,
+  owner,
+  userToken
 ) => {
   const lowerLimit = group.since;
   const upperLimit = group.until;
@@ -134,7 +140,9 @@ const createGroup = (
           item,
           acceptAppointment,
           cardClassNameAccepted,
-          cardClassNamePending
+          cardClassNamePending,
+          owner,
+          userToken
         )
       )}
     </Col>
@@ -152,31 +160,44 @@ const createCard = (
   item,
   acceptAppointment,
   classNameAccepted,
-  classNamePending
+  classNamePending,
+  accountName,
+  token
 ) => {
   const milis = item.until - item.since;
   const height = (milis / MILIS_IN_HOUR) * HOUR_PIXELS;
-  return (
-    <Popover
-      trigger="click"
-      content={
-        <div>
-          <Button
-            disabled={item.accepted}
-            onClick={() => acceptAppointment(item.id)}
-          >
-            Accept Me!
-          </Button>
-        </div>
-      }
-    >
-      <Card
-        style={{ height: height }}
-        className={item.accepted ? classNameAccepted : classNamePending}
-        title={item.id}
-      />
-    </Popover>
+  const card = (
+    <Card
+      style={{ height: height }}
+      className={item?.accepted ? classNameAccepted : classNamePending}
+    />
   );
+  const html =
+    item?.accepted == null ? (
+      card
+    ) : (
+      <Popover
+        trigger="click"
+        content={
+          <Card>
+            <div>{item.fromUser}</div>
+            <div>{item.since.format("HH:mm")}</div>
+            <div> {item.until.format("HH:mm")}</div>
+            <div>{item.description}</div>
+
+            <Button
+              disabled={item.accepted}
+              onClick={() => acceptAppointment(accountName, item.id, token)}
+            >
+              Accept Me!
+            </Button>
+          </Card>
+        }
+      >
+        {card}
+      </Popover>
+    );
+  return html;
 };
 
 export { binDataIntoDays, layoutCards };

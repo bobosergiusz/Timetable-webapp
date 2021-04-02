@@ -7,7 +7,7 @@ import { binDataIntoDays, layoutCards } from "./utils";
 import { FIRST_HOUR, LAST_HOUR } from "../../config";
 import { HOUR_PIXELS } from "./config";
 
-const AppsDisplay = ({ data, days, acceptAppointment }) => {
+const AppsDisplay = ({ data, days, acceptAppointment, owner, userToken }) => {
   const binnedData = binDataIntoDays(data, days);
 
   return (
@@ -21,7 +21,9 @@ const AppsDisplay = ({ data, days, acceptAppointment }) => {
           className="day-schedule shadowed-box"
           cardClassNameAccepted="appointment-card-pending shadowed-box"
           cardClassNamePending="appointment-card-accepted shadowed-box"
-          acceptAppointment={(id) => acceptAppointment(id)}
+          acceptAppointment={acceptAppointment}
+          owner={owner}
+          userToken={userToken}
         />
       ))}
     </Row>
@@ -31,7 +33,9 @@ const AppsDisplay = ({ data, days, acceptAppointment }) => {
 const HoursRibbon = ({ labelClassName }) => {
   const hourLabels = [];
   for (let i = FIRST_HOUR; i <= LAST_HOUR; i++) {
-    hourLabels.push(<HourLabel hour={i + ":00"} className={labelClassName} />);
+    hourLabels.push(
+      <HourLabel key={i} hour={i + ":00"} className={labelClassName} />
+    );
   }
   return <Col span={2}>{hourLabels}</Col>;
 };
@@ -43,6 +47,8 @@ const DaySchedule = ({
   className,
   cardClassNameAccepted,
   cardClassNamePending,
+  owner,
+  userToken,
 }) => {
   const height = (LAST_HOUR - FIRST_HOUR + 1) * HOUR_PIXELS;
   return (
@@ -53,7 +59,9 @@ const DaySchedule = ({
           data,
           acceptAppointment,
           cardClassNameAccepted,
-          cardClassNamePending
+          cardClassNamePending,
+          owner,
+          userToken
         )}
       </div>
     </Col>
@@ -70,6 +78,8 @@ AppsDisplay.propTypes = {
   days: PropTypes.array,
   data: PropTypes.array,
   acceptAppointment: PropTypes.func,
+  owner: PropTypes.string,
+  userToken: PropTypes.string,
 };
 HoursRibbon.propTypes = {
   labelClassName: PropTypes.string,
@@ -85,6 +95,8 @@ DaySchedule.propTypes = {
   className: PropTypes.string,
   cardClassNameAccepted: PropTypes.string,
   cardClassNamePending: PropTypes.string,
+  owner: PropTypes.string,
+  userToken: PropTypes.string,
 };
 export default AppsDisplay;
 export { HOUR_PIXELS };

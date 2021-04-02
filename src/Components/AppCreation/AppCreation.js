@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Popover, Card, DatePicker, Row, Space } from "antd";
+import { Button, Popover, Card, DatePicker, Form, Input } from "antd";
 import { PlusSquareOutlined } from "@ant-design/icons";
 
 import PropTypes from "prop-types";
@@ -7,11 +7,11 @@ import PropTypes from "prop-types";
 import { FIRST_HOUR, LAST_HOUR } from "../../config";
 
 const { RangePicker } = DatePicker;
+const { TextArea } = Input;
 
-const AppCreation = ({ addAppointment }) => {
+const AppCreation = ({ addAppointment, owner, userToken }) => {
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(false);
-
   return (
     <Popover
       trigger="hover"
@@ -25,7 +25,9 @@ const AppCreation = ({ addAppointment }) => {
         placement="bottom"
         content={
           <InputCard
-            addAppointment={(since, until) => addAppointment(since, until)}
+            addAppointment={addAppointment}
+            owner={owner}
+            userToken={userToken}
           />
         }
         visible={clicked}
@@ -47,15 +49,7 @@ const TitleCard = () => (
   <div className="add-appointment-hover">Add new appointment!</div>
 );
 
-function InputCard({ addAppointment }) {
-  const [since, setSince] = useState(false);
-  const [until, setUntil] = useState(false);
-
-  const setRange = (since, until) => {
-    setSince(since);
-    setUntil(until);
-  };
-
+function InputCard({ addAppointment, owner, userToken }) {
   const disabledHours1 = Array(FIRST_HOUR)
     .fill()
     .map((x, i) => i);
@@ -63,14 +57,37 @@ function InputCard({ addAppointment }) {
     .fill()
     .map((x, i) => LAST_HOUR + i + 1);
   const disabledHours = disabledHours1.concat(disabledHours2);
+
+  function onFinish(values) {
+    const [since, until] = values.sinceUntil;
+    addAppointment(owner, since, until, values.description, userToken);
+  }
+  const formLayout = {
+    labelCol: {
+      span: 6,
+    },
+    wrapperCol: {
+      span: 18,
+    },
+  };
   return (
     <Card
       className="add-appointment-input"
       bordered={false}
-      title="Fill information of the appointment"
+      title="Fill information for the appointment"
     >
-      <Space direction="vertical">
-        <Row>
+      <Form name="newAppointment" onFinish={onFinish}>
+        <Form.Item
+          {...formLayout}
+          label="Time range"
+          name="sinceUntil"
+          rules={[
+            {
+              required: true,
+              message: "Input time for the appointment!",
+            },
+          ]}
+        >
           <RangePicker
             format="YYYY-MM-DD HH:mm"
             showTime={{
@@ -78,21 +95,39 @@ function InputCard({ addAppointment }) {
               format: "HH:mm",
               disabledHours: () => disabledHours,
             }}
-            onChange={(dates) => setRange(dates[0], dates[1])}
           ></RangePicker>
-        </Row>
-        <Row justify="center">
-          <Button onClick={() => addAppointment(since, until)}>Add</Button>
-        </Row>
-      </Space>
+        </Form.Item>
+        <Form.Item
+          {...formLayout}
+          label="Message"
+          name="description"
+          rules={[
+            {
+              required: true,
+              message: "Input description!",
+            },
+          ]}
+        >
+          <TextArea rows={6} placeholder="Description..."></TextArea>
+        </Form.Item>
+        <Form.Item style={{ textAlign: "right" }}>
+          <Button htmlType="submit" type="primary">
+            Add
+          </Button>
+        </Form.Item>
+      </Form>
     </Card>
   );
 }
 
 AppCreation.propTypes = {
   addAppointment: PropTypes.func,
+  owner: PropTypes.string,
+  userToken: PropTypes.string,
 };
 InputCard.propTypes = {
   addAppointment: PropTypes.func,
+  owner: PropTypes.string,
+  userToken: PropTypes.string,
 };
 export default AppCreation;

@@ -1,106 +1,199 @@
 import moment from "moment";
 
 const FakeEndpoint = {
-  appointments: [
+  users: [
     {
-      id: 1,
-      since: "2021-03-01 12:00",
-      until: "2021-03-01 12:30",
-      accepted: true,
+      accountName: "dr A",
+      password: "dr A",
+      tags: ["best", "love"],
+      type: "service",
+      appointments: [
+        {
+          id: 1,
+          since: "2021-03-01 12:00",
+          until: "2021-03-01 12:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 51,
+          since: "2021-03-03 12:00",
+          until: "2021-03-04 12:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 61,
+          since: "2021-03-05 8:00",
+          until: "2021-03-05 12:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 8,
+          since: "2021-04-01 12:00",
+          until: "2021-04-01 12:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 10,
+          since: "2021-03-01 13:00",
+          until: "2021-03-01 14:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 2,
+          since: "2021-03-02 12:00",
+          until: "2021-03-02 12:30",
+          accepted: false,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 7,
+          since: "2021-03-02 13:00",
+          until: "2021-03-02 13:30",
+          accepted: false,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 5,
+          since: "2021-03-02 09:30",
+          until: "2021-03-02 10:00",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+      ],
     },
     {
-      id: 51,
-      since: "2021-03-03 12:00",
-      until: "2021-03-04 12:30",
-      accepted: true,
-    },
-    {
-      id: 61,
-      since: "2021-03-05 8:00",
-      until: "2021-03-05 12:30",
-      accepted: true,
-    },
-    {
-      id: 62,
-      since: "2021-03-05 10:00",
-      until: "2021-03-05 15:30",
-      accepted: true,
-    },
-    {
-      id: 22,
-      since: "2021-03-01 12:00",
-      until: "2021-03-01 13:30",
-      accepted: true,
-    },
-    {
-      id: 23,
-      since: "2021-03-01 13:00",
-      until: "2021-03-01 14:30",
-      accepted: true,
-    },
-    {
-      id: 8,
-      since: "2021-04-01 12:00",
-      until: "2021-04-01 12:30",
-      accepted: true,
-    },
-    {
-      id: 10,
-      since: "2021-03-01 13:00",
-      until: "2021-03-01 14:30",
-      accepted: true,
-    },
-    {
-      id: 2,
-      since: "2021-03-02 12:00",
-      until: "2021-03-02 12:30",
-      accepted: false,
-    },
-    {
-      id: 7,
-      since: "2021-03-02 13:00",
-      until: "2021-03-02 13:30",
-      accepted: false,
-    },
-    {
-      id: 5,
-      since: "2021-03-02 09:30",
-      until: "2021-03-02 10:00",
-      accepted: true,
+      accountName: "mr S",
+      tags: ["IT"],
+      type: "service",
+      password: "mr S",
+      appointments: [
+        {
+          id: 62,
+          since: "2021-03-05 10:00",
+          until: "2021-03-05 15:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 22,
+          since: "2021-03-01 12:00",
+          until: "2021-03-01 13:30",
+          accepted: false,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+        {
+          id: 23,
+          since: "2021-03-01 13:00",
+          until: "2021-03-01 14:30",
+          accepted: true,
+          fromUser: "konan",
+          description: "im giovani giorgio",
+        },
+      ],
     },
   ],
-  getAppointments() {
+  createUser(user) {
+    const u = this.users.find((u) => u.accountName == user.accountName);
+
+    if (u == null) {
+      this.users.push(user);
+      return new Promise((resolve) => resolve(user));
+    } else {
+      return Promise.reject(new Error("User exists"));
+    }
+  },
+  login(accountName, password) {
+    const u = this.users.find((u) => u.accountName == accountName);
+    if (u?.password == password) {
+      return new Promise((resolve) => resolve({ token: accountName }));
+    } else {
+      return Promise.reject(new Error("Wrong login"));
+    }
+  },
+  searchServices(tags) {
+    const tagsSplitted = tags.trim() == "" ? [] : tags.trim().split(", ");
+    var usersSelected = this.users.filter((u) => u?.type == "service");
+    for (let tag of tagsSplitted) {
+      usersSelected = usersSelected.filter((u) => u.tags.includes(tag));
+    }
+    return new Promise((resolve) => resolve(usersSelected));
+  },
+
+  getAppointments(accountName, token) {
+    const u = this.users.find((u) => u.accountName == accountName);
+    if (u == null) {
+      return Promise.reject(new Error("User does not exist"));
+    }
+    const appointments = u.appointments;
     const arrPrepared = [];
-    for (const app of this.appointments) {
-      const prepared = Object.assign({}, app);
-      prepared.since = moment(prepared.since);
-      prepared.until = moment(prepared.until);
-      arrPrepared.push(prepared);
+    if (token == accountName) {
+      for (const app of appointments) {
+        const prepared = Object.assign({}, app);
+        prepared.since = moment(prepared.since);
+        prepared.until = moment(prepared.until);
+        arrPrepared.push(prepared);
+      }
+    } else {
+      for (const app of appointments) {
+        const prepared = {};
+        if (app.accepted) {
+          prepared.since = moment(app.since);
+          prepared.until = moment(app.until);
+          arrPrepared.push(prepared);
+        }
+      }
     }
     return new Promise((resolve) => resolve(arrPrepared));
   },
-  postAppointment(since, until) {
+  postAppointment(accountName, since, until, description, token) {
+    const c = this.users.find((u) => u.accountName == token);
+    if (c == null) {
+      return Promise.reject(new Error("Authorization error"));
+    }
+    const u = this.users.find((u) => u.accountName == accountName);
+    const fromUser = token;
     const prepared = {};
+    prepared.id = this.availableId(u.appointments);
+    prepared.fromUser = fromUser;
     prepared.since = since.format("YYYY-MM-DD HH:mm");
     prepared.until = until.format("YYYY-MM-DD HH:mm");
+    prepared.description = description;
     prepared.accepted = false;
-    prepared.id = this.availableId();
-    this.appointments.push(prepared);
+    u.appointments.push(prepared);
     const toReturn = Object.assign({}, prepared);
     toReturn.since = since;
     toReturn.until = until;
     return new Promise((resolve) => resolve(toReturn));
   },
-  putAppointment(id) {
-    const app = this.appointments.find((el) => el.id == id);
+  putAppointment(accountName, id, token) {
+    if (token != accountName) {
+      return Promise.reject(new Error("Authorization error"));
+    }
+    const u = this.users.find((u) => u.accountName == accountName);
+    const app = u.appointments.find((a) => a.id == id);
     app.accepted = true;
     const toReturn = Object.assign({}, app);
     toReturn.since = moment(toReturn.since);
     toReturn.until = moment(toReturn.until);
     return new Promise((resolve) => resolve(toReturn));
   },
-  availableId() {
-    const sorted = [...this.appointments].sort((a, b) => {
+  availableId(appointments) {
+    const sorted = [...appointments].sort((a, b) => {
       return a.id - b.id;
     });
     for (const [id, app] of sorted.entries()) {
