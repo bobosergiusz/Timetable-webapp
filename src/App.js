@@ -19,25 +19,25 @@ const { Header, Content, Footer } = Layout;
 const App = () => {
   const [userState, setUserState] = useState({
     userSignedIn: false,
-    userData: { accountName: null, jwtToken: null },
+    accountName: null,
   });
 
   const [curentView, setCurrentView] = useState(
-    <UserList servicesToShow={[]} onChoice={setViewTimetable} />
+    <UserList getData={getServices} tags={""} onChoice={setViewTimetable} />
   );
 
   useEffect(() => setViewService(""), []);
 
-  function setUserSignIn(accountName, jwtToken) {
+  function setUserSignIn(accountName) {
     setUserState({
       userSignedIn: true,
-      userData: { accountName: accountName, jwtToken: jwtToken },
+      accountName: accountName,
     });
   }
   function setUserSignOut() {
     setUserState({
       userSignedIn: false,
-      userData: { accountName: null, jwtToken: null },
+      accountName: null,
     });
   }
 
@@ -46,37 +46,48 @@ const App = () => {
   }
   function setViewTimetable(accountName) {
     setCurrentView(
-      <Timetable
-        Endpoint={EndpointAdapter}
-        accountName={accountName}
-        userToken={userState.userData?.jwtToken}
-      />
+      <Timetable Endpoint={EndpointAdapter} accountName={accountName} />
     );
   }
+
+  function getServices(tags, callback) {
+    EndpointAdapter.searchServices(tags).then(callback);
+  }
   function setViewService(tags) {
-    EndpointAdapter.searchServices(tags).then((res) => {
-      setCurrentView(
-        <UserList servicesToShow={res} onChoice={setViewTimetable}></UserList>
-      );
-    });
+    setCurrentView(
+      <UserList
+        getData={getServices}
+        tags={tags}
+        onChoice={setViewTimetable}
+      ></UserList>
+    );
   }
 
   function onSignIn(accountName, password) {
     EndpointAdapter.login(accountName, password).then(
-      (res) => {
-        setUserSignIn(accountName, res.token);
-        message.success("User signed in!", 10);
+      () => {
+        setUserSignIn(accountName);
+        message.success("User signed in!", 3);
       },
-      () => message.error("Error occured!")
+      () => message.error("Error occured!", 3)
+    );
+  }
+  function onSingOut() {
+    EndpointAdapter.logout().then(
+      () => {
+        setUserSignOut();
+        message.success("User signed out!", 3);
+      },
+      () => message.error("Error occured!", 3)
     );
   }
 
   function onSignUp(user) {
     EndpointAdapter.createUser(user).then(
       () => {
-        message.success("User created!", 10);
+        message.success("User created!", 3);
       },
-      () => message.error("Error occured!")
+      () => message.error("Error occured!", 3)
     );
   }
   return (
@@ -88,13 +99,15 @@ const App = () => {
               <div className="logo">Schedule a meeting</div>
             </Col>
             <Col span={8}>
-              <Searchbar onSearch={setViewService} />
+              <Row>
+                <Searchbar onSearch={setViewService} />
+              </Row>
             </Col>
             <Col span={8}>
               <UserSection
                 userState={userState}
-                onSignIn={setViewSignInUp}
-                onSignOut={setUserSignOut}
+                signInClick={setViewSignInUp}
+                onSignOut={onSingOut}
               />
             </Col>
           </Row>

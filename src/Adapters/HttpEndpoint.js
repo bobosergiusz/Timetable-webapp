@@ -35,20 +35,25 @@ const HttpEndpoint = {
       headers: {
         "Content-Type": "application/json",
       },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Error");
-        } else {
-          return res;
-        }
-      })
-      .then((res) => res.json())
-      .then((res) => {
-        res.token = res.access_token;
-        delete res.access_token;
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error("Error");
+      } else {
         return res;
-      });
+      }
+    });
+    return promise;
+  },
+  logout() {
+    const promise = fetch(`http://127.0.0.1/logout`, {
+      method: "POST",
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error("Error");
+      } else {
+        return res;
+      }
+    });
     return promise;
   },
   searchServices(tags) {
@@ -61,8 +66,9 @@ const HttpEndpoint = {
     return promise;
   },
 
-  getAppointments(accountName, token) {
-    const headers = token != null ? { Authorization: `Bearer ${token}` } : {};
+  getAppointments(accountName) {
+    const csrfToken = this.getCookie("csrf_access_token");
+    const headers = csrfToken != null ? { "X-CSRF-TOKEN": csrfToken } : {};
     const promise = fetch(
       `http://127.0.0.1/service/${accountName}/appointment`,
       {
@@ -74,7 +80,8 @@ const HttpEndpoint = {
       .then((res) => res.map((item) => this.prepareApp(item)));
     return promise;
   },
-  postAppointment(accountName, since, until, description, token) {
+  postAppointment(accountName, since, until, description) {
+    const csrfToken = this.getCookie("csrf_access_token");
     const data = {};
     data.since = since.format("YYYY-MM-DD HH:mm");
     data.until = until.format("YYYY-MM-DD HH:mm");
@@ -87,7 +94,7 @@ const HttpEndpoint = {
         body: JSON.stringify(data),
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "X-CSRF-TOKEN": csrfToken,
         },
       }
     )
@@ -102,12 +109,13 @@ const HttpEndpoint = {
       .then((item) => this.prepareApp(item));
     return promise;
   },
-  putAppointment(accountName, id, token) {
+  putAppointment(accountName, id) {
+    const csrfToken = this.getCookie("csrf_access_token");
     const promise = fetch(
       `http://127.0.0.1/service/${accountName}/appointment/${id}`,
       {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { "X-CSRF-TOKEN": csrfToken },
       }
     )
       .then((res) => {
@@ -135,6 +143,11 @@ const HttpEndpoint = {
     item.accountName = item.account_name;
     delete item.account_name;
     return item;
+  },
+  getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
   },
 };
 

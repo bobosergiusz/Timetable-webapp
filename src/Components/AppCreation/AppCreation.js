@@ -9,7 +9,7 @@ import { FIRST_HOUR, LAST_HOUR } from "../../config";
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 
-const AppCreation = ({ addAppointment, owner, userToken }) => {
+const AppCreation = ({ addAppointment, owner }) => {
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(false);
   return (
@@ -23,13 +23,7 @@ const AppCreation = ({ addAppointment, owner, userToken }) => {
       <Popover
         trigger="click"
         placement="bottom"
-        content={
-          <InputCard
-            addAppointment={addAppointment}
-            owner={owner}
-            userToken={userToken}
-          />
-        }
+        content={<InputCard addAppointment={addAppointment} owner={owner} />}
         visible={clicked}
         onVisibleChange={(visible) => setClicked(visible)}
       >
@@ -49,7 +43,7 @@ const TitleCard = () => (
   <div className="add-appointment-hover">Add new appointment!</div>
 );
 
-function InputCard({ addAppointment, owner, userToken }) {
+function InputCard({ addAppointment, owner }) {
   const disabledHours1 = Array(FIRST_HOUR)
     .fill()
     .map((x, i) => i);
@@ -60,7 +54,7 @@ function InputCard({ addAppointment, owner, userToken }) {
 
   function onFinish(values) {
     const [since, until] = values.sinceUntil;
-    addAppointment(owner, since, until, values.description, userToken);
+    addAppointment(owner, since, until, values.description);
   }
   const formLayout = {
     labelCol: {
@@ -123,11 +117,9 @@ function InputCard({ addAppointment, owner, userToken }) {
 AppCreation.propTypes = {
   addAppointment: PropTypes.func,
   owner: PropTypes.string,
-  userToken: PropTypes.string,
 };
 InputCard.propTypes = {
   addAppointment: PropTypes.func,
   owner: PropTypes.string,
-  userToken: PropTypes.string,
 };
 export default AppCreation;

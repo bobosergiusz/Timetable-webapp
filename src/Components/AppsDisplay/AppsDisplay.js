@@ -7,7 +7,7 @@ import { binDataIntoDays, layoutCards } from "./utils";
 import { FIRST_HOUR, LAST_HOUR } from "../../config";
 import { HOUR_PIXELS } from "./config";
 
-const AppsDisplay = ({ data, days, acceptAppointment, owner, userToken }) => {
+const AppsDisplay = ({ data, days, acceptAppointment, owner }) => {
   const binnedData = binDataIntoDays(data, days);
 
   return (
@@ -23,7 +23,6 @@ const AppsDisplay = ({ data, days, acceptAppointment, owner, userToken }) => {
           cardClassNamePending="appointment-card-accepted shadowed-box"
           acceptAppointment={acceptAppointment}
           owner={owner}
-          userToken={userToken}
         />
       ))}
     </Row>
@@ -48,7 +47,6 @@ const DaySchedule = ({
   cardClassNameAccepted,
   cardClassNamePending,
   owner,
-  userToken,
 }) => {
   const height = (LAST_HOUR - FIRST_HOUR + 1) * HOUR_PIXELS;
   return (
@@ -60,8 +58,7 @@ const DaySchedule = ({
           acceptAppointment,
           cardClassNameAccepted,
           cardClassNamePending,
-          owner,
-          userToken
+          owner
         )}
       </div>
     </Col>
@@ -79,7 +76,6 @@ AppsDisplay.propTypes = {
   data: PropTypes.array,
   acceptAppointment: PropTypes.func,
   owner: PropTypes.string,
-  userToken: PropTypes.string,
 };
 HoursRibbon.propTypes = {
   labelClassName: PropTypes.string,
@@ -96,7 +92,6 @@ DaySchedule.propTypes = {
   cardClassNameAccepted: PropTypes.string,
   cardClassNamePending: PropTypes.string,
   owner: PropTypes.string,
-  userToken: PropTypes.string,
 };
 export default AppsDisplay;
 export { HOUR_PIXELS };

@@ -1,15 +1,16 @@
-import { message, Avatar, Popover, Button } from "antd";
+import { Avatar, Popover, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 
 import PropTypes from "prop-types";
 
 //TODO: add button to see owned calendar if service logged in
-//TODO: add proper backend error handling
-function UserSection({ userState, onSignIn, onSignOut }) {
-  const popoverContent = userState?.userSignedIn ? (
-    <UserInfo userData={userState.userData} onSignOut={onSignOut} />
+//TODO: kalendarz w foormularzu tworzenia app powinien zaczynac sie od poniedzialku
+//sign out nie czysci danych logowania
+function UserSection({ userState, signInClick, onSignOut }) {
+  const popoverContent = userState.userSignedIn ? (
+    <UserInfo userState={userState} onSignOut={onSignOut} />
   ) : (
-    <SignInButton onSignIn={onSignIn} />
+    <SignInButton signInClick={signInClick} />
   );
   return (
     <Popover placement="right" content={popoverContent}>
@@ -18,35 +19,29 @@ function UserSection({ userState, onSignIn, onSignOut }) {
   );
 }
 
-function UserInfo({ userData, onSignOut }) {
+function UserInfo({ userState, onSignOut }) {
   return (
     <div size="small">
-      Logged as: <b>{userData.accountName}</b>{" "}
-      <Button
-        onClick={() => {
-          onSignOut(), message.info("Signet out!");
-        }}
-      >
-        Sign out
-      </Button>
+      Logged as: <b>{userState.accountName}</b>{" "}
+      <Button onClick={() => onSignOut()}>Sign out</Button>
     </div>
   );
 }
 
-function SignInButton({ onSignIn }) {
-  return <Button onClick={() => onSignIn()}>Sign in</Button>;
+function SignInButton({ signInClick }) {
+  return <Button onClick={() => signInClick()}>Sign in</Button>;
 }
 
 UserSection.propTypes = {
   userState: PropTypes.object,
   onSignOut: PropTypes.func,
-  onSignIn: PropTypes.func,
+  signInClick: PropTypes.func,
 };
 UserInfo.propTypes = {
-  userData: PropTypes.object,
+  userState: PropTypes.object,
   onSignOut: PropTypes.func,
 };
 SignInButton.propTypes = {
-  onSignIn: PropTypes.func,
+  signInClick: PropTypes.func,
 };
 export default UserSection;

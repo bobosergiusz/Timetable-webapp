@@ -1,38 +1,41 @@
-import { Row, Col, Button } from "antd";
+import { Table, Tag } from "antd";
 
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
-function UserList({ servicesToShow, onChoice }) {
-  return servicesToShow.map(({ accountName, tags }, i) => (
-    <UserRow
-      key={i}
-      accountName={accountName}
-      tags={tags}
-      onChoice={onChoice}
-    ></UserRow>
-  ));
-}
-function UserRow({ accountName, tags, onChoice }) {
-  const onClick = () => {
-    onChoice(accountName);
-  };
+import "./UserList.css";
+
+const { Column } = Table;
+
+function UserList({ getData, tags, onChoice }) {
+  const [servicesToShow, setServicesToShow] = useState([]);
+  useEffect(() => getData(tags, setServicesToShow), [tags]);
   return (
-    <Row>
-      <Col>
-        <Button type="link" onClick={onClick}>
-          {accountName}
-        </Button>
-      </Col>
-      <Col>{tags.join(", ")}</Col>
-    </Row>
+    <Table
+      dataSource={servicesToShow}
+      pagination={false}
+      onRow={(record) => {
+        return {
+          onClick: () => onChoice(record.accountName),
+        };
+      }}
+      rowClassName={() => "row"}
+    >
+      <Column title="Name" dataIndex="accountName" key="accountName" />
+      <Column
+        title="Tags"
+        dataIndex="tags"
+        key="tags"
+        render={(tags) => tags.map((tag, key) => <Tag key={key}>{tag}</Tag>)}
+      />
+    </Table>
   );
 }
+
 UserList.propTypes = {
-  tags: PropTypes.string,
-};
-UserRow.propTypes = {
-  accountName: PropTypes.string,
+  getData: PropTypes.func,
   tags: PropTypes.array,
   onChoice: PropTypes.func,
 };
+
 export default UserList;

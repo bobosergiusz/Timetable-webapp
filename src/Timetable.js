@@ -13,44 +13,38 @@ import "./Timetable.css";
 
 const { Header, Content } = Layout;
 
-function Timetable({ Endpoint, accountName, userToken }) {
-  const [baseMonday, setBaseMonday] = useState(moment().startOf("isoWeek"));
-  const daysToDisplay = daysOfTheWeekFromDate(baseMonday);
+function Timetable({ Endpoint, accountName }) {
+  const [baseDay, setBaseDay] = useState(moment().startOf("Week"));
+  const daysToDisplay = daysOfTheWeekFromDate(baseDay);
 
   const [dataToDisplay, setDataToDisplay] = useState([]);
   useEffect(() => {
-    Endpoint.getAppointments(accountName, userToken).then((res) => {
+    Endpoint.getAppointments(accountName).then((res) => {
       setDataToDisplay(res);
     });
   }, []);
 
-  const addAppointment = (accountName, since, until, description, token) => {
-    Endpoint.postAppointment(
-      accountName,
-      since,
-      until,
-      description,
-      token
-    ).then(
+  const addAppointment = (accountName, since, until, description) => {
+    Endpoint.postAppointment(accountName, since, until, description).then(
       () => {
-        message.success("Appointment proposed!");
-        Endpoint.getAppointments(accountName, token).then((res) =>
+        message.success("Appointment proposed!", 3);
+        Endpoint.getAppointments(accountName).then((res) =>
           setDataToDisplay(res)
         );
       },
-      () => message.error("There was some error!")
+      () => message.error("There was some error!", 3)
     );
   };
 
-  const acceptAppointment = (accountName, id, token) => {
-    Endpoint.putAppointment(accountName, id, token).then(
+  const acceptAppointment = (accountName, id) => {
+    Endpoint.putAppointment(accountName, id).then(
       () => {
-        message.success("Appointment accepted!");
-        Endpoint.getAppointments(accountName, token).then((res) =>
+        message.success("Appointment accepted!", 3);
+        Endpoint.getAppointments(accountName).then((res) =>
           setDataToDisplay(res)
         );
       },
-      () => message.error("There was some error!")
+      () => message.error("There was some error!", 3)
     );
   };
 
@@ -62,12 +56,10 @@ function Timetable({ Endpoint, accountName, userToken }) {
             <DatePicker
               picker="month"
               format="MMMM YYYY"
-              value={baseMonday.clone().add(1, "week")}
+              value={baseDay.clone().add(1, "week")}
               onChange={(date) =>
-                setBaseMonday(
-                  date == null
-                    ? baseMonday
-                    : date.startOf("month").startOf("isoWeek")
+                setBaseDay(
+                  date == null ? baseDay : date.startOf("month").startOf("Week")
                 )
               }
               bordered={false}
@@ -80,7 +72,6 @@ function Timetable({ Endpoint, accountName, userToken }) {
             <AppCreation
               addAppointment={addAppointment}
               owner={accountName}
-              userToken={userToken}
             ></AppCreation>
           </Col>
         </Row>
@@ -88,8 +79,8 @@ function Timetable({ Endpoint, accountName, userToken }) {
       <Content className="timetable">
         <DaysRibbon
           days={daysToDisplay}
-          backWeek={() => setBaseMonday(baseMonday.clone().subtract(1, "week"))}
-          forwardWeek={() => setBaseMonday(baseMonday.clone().add(1, "week"))}
+          backWeek={() => setBaseDay(baseDay.clone().subtract(1, "week"))}
+          forwardWeek={() => setBaseDay(baseDay.clone().add(1, "week"))}
         />
         <Divider />
         <AppsDisplay
@@ -97,7 +88,6 @@ function Timetable({ Endpoint, accountName, userToken }) {
           days={daysToDisplay}
           acceptAppointment={acceptAppointment}
           owner={accountName}
-          userToken={userToken}
         />
         <div className="footer-divider"></div>
       </Content>
@@ -108,7 +98,6 @@ function Timetable({ Endpoint, accountName, userToken }) {
 Timetable.propTypes = {
   Endpoint: PropTypes.object,
   accountName: PropTypes.string,
-  userToken: PropTypes.string,
 };
 
 export default Timetable;

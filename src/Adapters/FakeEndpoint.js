@@ -120,10 +120,13 @@ const FakeEndpoint = {
   login(accountName, password) {
     const u = this.users.find((u) => u.accountName == accountName);
     if (u?.password == password) {
-      return new Promise((resolve) => resolve({ token: accountName }));
+      return new Promise(() => null);
     } else {
       return Promise.reject(new Error("Wrong login"));
     }
+  },
+  logout() {
+    return new Promise((resolve) => resolve(null));
   },
   searchServices(tags) {
     const tagsSplitted = tags.trim() == "" ? [] : tags.trim().split(", ");
@@ -134,39 +137,26 @@ const FakeEndpoint = {
     return new Promise((resolve) => resolve(usersSelected));
   },
 
-  getAppointments(accountName, token) {
+  getAppointments(accountName) {
     const u = this.users.find((u) => u.accountName == accountName);
     if (u == null) {
       return Promise.reject(new Error("User does not exist"));
     }
     const appointments = u.appointments;
     const arrPrepared = [];
-    if (token == accountName) {
-      for (const app of appointments) {
-        const prepared = Object.assign({}, app);
-        prepared.since = moment(prepared.since);
-        prepared.until = moment(prepared.until);
+    for (const app of appointments) {
+      const prepared = {};
+      if (app.accepted) {
+        prepared.since = moment(app.since);
+        prepared.until = moment(app.until);
         arrPrepared.push(prepared);
-      }
-    } else {
-      for (const app of appointments) {
-        const prepared = {};
-        if (app.accepted) {
-          prepared.since = moment(app.since);
-          prepared.until = moment(app.until);
-          arrPrepared.push(prepared);
-        }
       }
     }
     return new Promise((resolve) => resolve(arrPrepared));
   },
-  postAppointment(accountName, since, until, description, token) {
-    const c = this.users.find((u) => u.accountName == token);
-    if (c == null) {
-      return Promise.reject(new Error("Authorization error"));
-    }
+  postAppointment(accountName, since, until, description) {
     const u = this.users.find((u) => u.accountName == accountName);
-    const fromUser = token;
+    const fromUser = "dummy";
     const prepared = {};
     prepared.id = this.availableId(u.appointments);
     prepared.fromUser = fromUser;
@@ -180,10 +170,7 @@ const FakeEndpoint = {
     toReturn.until = until;
     return new Promise((resolve) => resolve(toReturn));
   },
-  putAppointment(accountName, id, token) {
-    if (token != accountName) {
-      return Promise.reject(new Error("Authorization error"));
-    }
+  putAppointment(accountName, id) {
     const u = this.users.find((u) => u.accountName == accountName);
     const app = u.appointments.find((a) => a.id == id);
     app.accepted = true;

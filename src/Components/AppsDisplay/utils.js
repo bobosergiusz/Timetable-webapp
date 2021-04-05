@@ -28,8 +28,7 @@ const layoutCards = (
   acceptAppointment,
   cardClassNameAccepted,
   cardClassNamePending,
-  owner,
-  userToken
+  owner
 ) => {
   const lowerLimit = day.clone().hour(FIRST_HOUR);
   const upperLimit = day.clone().hour(LAST_HOUR + 1);
@@ -59,8 +58,7 @@ const layoutCards = (
         acceptAppointment,
         cardClassNameAccepted,
         cardClassNamePending,
-        owner,
-        userToken
+        owner
       )
   );
   return returnValue;
@@ -126,8 +124,7 @@ const createGroup = (
   acceptAppointment,
   cardClassNameAccepted,
   cardClassNamePending,
-  owner,
-  userToken
+  owner
 ) => {
   const lowerLimit = group.since;
   const upperLimit = group.until;
@@ -141,8 +138,7 @@ const createGroup = (
           acceptAppointment,
           cardClassNameAccepted,
           cardClassNamePending,
-          owner,
-          userToken
+          owner
         )
       )}
     </Col>
@@ -161,8 +157,7 @@ const createCard = (
   acceptAppointment,
   classNameAccepted,
   classNamePending,
-  accountName,
-  token
+  accountName
 ) => {
   const milis = item.until - item.since;
   const height = (milis / MILIS_IN_HOUR) * HOUR_PIXELS;
@@ -187,7 +182,7 @@ const createCard = (
 
             <Button
               disabled={item.accepted}
-              onClick={() => acceptAppointment(accountName, item.id, token)}
+              onClick={() => acceptAppointment(accountName, item.id)}
             >
               Accept Me!
             </Button>
