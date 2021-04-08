@@ -112,7 +112,7 @@ const FakeEndpoint = {
 
     if (u == null) {
       this.users.push(user);
-      return new Promise((resolve) => resolve(user));
+      return new Promise((resolve) => resolve(null));
     } else {
       return Promise.reject(new Error("User exists"));
     }
@@ -165,19 +165,13 @@ const FakeEndpoint = {
     prepared.description = description;
     prepared.accepted = false;
     u.appointments.push(prepared);
-    const toReturn = Object.assign({}, prepared);
-    toReturn.since = since;
-    toReturn.until = until;
-    return new Promise((resolve) => resolve(toReturn));
+    return new Promise((resolve) => resolve(null));
   },
   putAppointment(accountName, id) {
     const u = this.users.find((u) => u.accountName == accountName);
     const app = u.appointments.find((a) => a.id == id);
     app.accepted = true;
-    const toReturn = Object.assign({}, app);
-    toReturn.since = moment(toReturn.since);
-    toReturn.until = moment(toReturn.until);
-    return new Promise((resolve) => resolve(toReturn));
+    return new Promise((resolve) => resolve(null));
   },
   availableId(appointments) {
     const sorted = [...appointments].sort((a, b) => {
